@@ -36,7 +36,7 @@ public class MainActivity extends Activity {
         }
         FrameLayout root = new FrameLayout(this);
         map = new MapView(this);
-        map.setTileSource(TileSourceFactory.MAPNIK);
+    map.setTileSource(new org.osmdroid.tileprovider.tilesource.XYTileSource("CartoLight", 0, 19, 256, ".png", new String[]{"https://a.basemaps.cartocdn.com/light_all/","https://b.basemaps.cartocdn.com/light_all/","https://c.basemaps.cartocdn.com/light_all/"}));
         map.setMultiTouchControls(true);
         map.getController().setZoom(13.0);
         map.getController().setCenter(sel);
