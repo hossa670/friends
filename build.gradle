@@ -1,1 +1,25 @@
-plugins { id 'com.android.application' version '8.5.2' apply false }
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.example.fakeloc'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'com.nav.mapviewer'
+        minSdk 24
+        targetSdk 34
+        versionCode 3
+        versionName '1.2'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'org.osmdroid:osmdroid-android:6.1.20'
+}
