@@ -27,7 +27,7 @@ public class MainActivity extends Activity {
     @Override protected void onCreate(Bundle s) {
         super.onCreate(s);
         Configuration.getInstance().load(this, getSharedPreferences("osm", 0));
-        Configuration.getInstance().setUserAgentValue(getPackageName());
+        Configuration.getInstance().setUserAgentValue("HossaFriendsLocation/1.0 (hossa670)");
         if (Build.VERSION.SDK_INT >= 23) {
             String[] perms = Build.VERSION.SDK_INT >= 33
                     ? new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.POST_NOTIFICATIONS}
