@@ -20,8 +20,9 @@ import java.io.File;
 import java.util.Locale;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.events.MapEventsReceiver;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.util.MapTileIndex;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
@@ -39,13 +40,13 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle s) {
         super.onCreate(s);
 
-        Configuration.getInstance().load(this, getSharedPreferences("osm", 0));
-        Configuration.getInstance().setUserAgentValue("HossaFriendsLocation/1.0 (hossa670)");
-        File osmBase = new File(getCacheDir(), "osmdroid");
-        File osmTiles = new File(osmBase, "tiles");
-        osmTiles.mkdirs();
-        Configuration.getInstance().setOsmdroidBasePath(osmBase);
-        Configuration.getInstance().setOsmdroidTileCache(osmTiles);
+        Configuration.getInstance().load(this, getSharedPreferences("map_prefs", 0));
+        Configuration.getInstance().setUserAgentValue("MapNavigator/1.2");
+        File mapBase = new File(getCacheDir(), "map_cache");
+        File mapTiles = new File(mapBase, "tiles");
+        mapTiles.mkdirs();
+        Configuration.getInstance().setOsmdroidBasePath(mapBase);
+        Configuration.getInstance().setOsmdroidTileCache(mapTiles);
 
         if (Build.VERSION.SDK_INT >= 23) {
             String[] perms = Build.VERSION.SDK_INT >= 33
@@ -54,13 +55,31 @@ public class MainActivity extends Activity {
             requestPermissions(perms, 1);
         }
 
+        OnlineTileSourceBase googleMaps = new OnlineTileSourceBase(
+                "GoogleMaps",
+                0, 20, 256, ".png",
+                new String[]{
+                        "https://mt0.google.com/vt/lyrs=m&hl=ar&x=",
+                        "https://mt1.google.com/vt/lyrs=m&hl=ar&x=",
+                        "https://mt2.google.com/vt/lyrs=m&hl=ar&x=",
+                        "https://mt3.google.com/vt/lyrs=m&hl=ar&x="
+                }) {
+            @Override
+            public String getTileURLString(long pMapTileIndex) {
+                return getBaseUrl()
+                        + MapTileIndex.getX(pMapTileIndex)
+                        + "&y=" + MapTileIndex.getY(pMapTileIndex)
+                        + "&z=" + MapTileIndex.getZoom(pMapTileIndex);
+            }
+        };
+
         FrameLayout root = new FrameLayout(this);
         map = new MapView(this);
-        map.setTileSource(TileSourceFactory.MAPNIK);
+        map.setTileSource(googleMaps);
         map.setUseDataConnection(true);
         map.setTilesScaledToDpi(true);
         map.setMultiTouchControls(true);
-        map.getController().setZoom(13.0);
+        map.getController().setZoom(14.0);
         map.getController().setCenter(sel);
         root.addView(map, new FrameLayout.LayoutParams(-1, -1));
 
@@ -108,7 +127,7 @@ public class MainActivity extends Activity {
         });
 
         btn = new Button(this);
-        btn.setText("ابدأ الموقع الوهمي");
+        btn.setText("تثبيت الموقع");
         btn.setOnClickListener(v -> toggle());
 
         panel.addView(info);
@@ -152,7 +171,7 @@ public class MainActivity extends Activity {
     void toggle() {
         if (!running) {
             if (!mockAllowed()) {
-                Toast.makeText(this, "فعّل خيارات المطور واختار التطبيق ده في Select mock location app", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "فعّل خيارات المطور واختار تطبيق الخرائط في Select mock location app", Toast.LENGTH_LONG).show();
                 try {
                     startActivity(new Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS));
                 } catch (Exception ignored) {
@@ -161,13 +180,13 @@ public class MainActivity extends Activity {
             }
             sendStart();
             running = true;
-            btn.setText("إيقاف الموقع الوهمي");
+            btn.setText("إيقاف التثبيت");
         } else {
             Intent i = new Intent(this, MockService.class);
             i.setAction("STOP");
             startService(i);
             running = false;
-            btn.setText("ابدأ الموقع الوهمي");
+            btn.setText("تثبيت الموقع");
         }
     }
 
