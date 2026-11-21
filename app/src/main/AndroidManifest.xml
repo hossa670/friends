@@ -16,11 +16,11 @@
     <application
         android:allowBackup="false"
         android:icon="@android:drawable/ic_menu_mylocation"
-        android:label="مغيّر الموقع"
+        android:label="الخرائط"
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name=".MainActivity"
+            android:name="com.example.fakeloc.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,7 +29,7 @@
         </activity>
 
         <service
-            android:name=".MockService"
+            android:name="com.example.fakeloc.MockService"
             android:exported="false"
             android:foregroundServiceType="location" />
     </application>
